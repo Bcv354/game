@@ -3,15 +3,22 @@ package com.mygdx.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.game.screens.ScreenGame;
+import com.mygdx.game.screens.ScreenMenu;
+import com.mygdx.game.screens.ScreenRestart;
+
 
 public class MyGdxGame extends Game {
 
 	public SpriteBatch batch;
 	public OrthographicCamera camera;
 
-	public final int SCR_WIDTH = 1280, SCR_HEIGHT = 720;
+	public static final int SCR_WIDTH = 1280;
+	public static final int SCR_HEIGHT = 720;
 
-	ScreenGame screenGame;
+	public ScreenGame screenGame;
+	public ScreenRestart screenRestart;
+	public ScreenMenu screenMenu;
 
 	@Override
 	public void create() {
@@ -20,7 +27,10 @@ public class MyGdxGame extends Game {
 		camera.setToOrtho(false, SCR_WIDTH, SCR_HEIGHT);
 
 		screenGame = new ScreenGame(this);
-		setScreen(screenGame);
+		screenRestart = new ScreenRestart(this);
+		screenMenu = new ScreenMenu(this);
+
+		setScreen(screenMenu);
 	}
 
 
