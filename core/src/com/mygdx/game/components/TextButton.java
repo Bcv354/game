@@ -1,10 +1,12 @@
 package com.mygdx.game.components;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 
 public class TextButton {
 
@@ -23,9 +25,19 @@ public class TextButton {
         this.x = x;
         this.y = y;
 
-        font = new BitmapFont();
-        font.getData().scale(5f);
-        font.setColor(Color.WHITE);
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(
+                Gdx.files.internal("fonts/saira.ttf")
+        );
+        FreeTypeFontGenerator.FreeTypeFontParameter params =
+                new FreeTypeFontGenerator.FreeTypeFontParameter();
+
+        params.size = 55;
+        params.color = Color.WHITE;
+        params.borderWidth = 2f;
+        params.borderColor = Color.BLACK;
+
+        font = generator.generateFont(params);
+        generator.dispose();
 
         GlyphLayout gl = new GlyphLayout(font, text);
         textWidth = (int) gl.width;
@@ -40,8 +52,6 @@ public class TextButton {
     }
 
     public boolean isHit(int tx, int ty) {
-        System.out.println(tx + " - " + ty);
-        System.out.println(x + " - " + y);
         return tx >= x && tx <= x + buttonWidth
                 && ty >= y && ty <= y + buttonHeight;
     }

@@ -42,16 +42,18 @@ public class Bird {
         jumpHeight = maxHeightOfJump + y;
     }
 
+    // было
     public void fly() {
-        if (y >= jumpHeight) {
-            jump = false;
-        }
+        if (y >= jumpHeight) jump = false;
+        if (jump) y += speed;
+        else y -= speed;
+    }
 
-        if (jump) {
-            y += speed;
-        } else {
-            y -= speed;
-        }
+    // стало
+    public void fly(float delta) {
+        if (y >= jumpHeight) jump = false;
+        if (jump) y += speed * delta * 60;
+        else y -= speed * delta * 60;
     }
 
     public boolean isInField() {

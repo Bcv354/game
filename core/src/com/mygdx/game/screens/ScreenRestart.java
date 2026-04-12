@@ -20,11 +20,14 @@ public class ScreenRestart implements Screen {
     TextButton buttonMenu;
 
     int gamePoints;
+    int bestScore = 0; // добавить
+    PointCounter bestScoreCounter; // добавить второй счётчик
 
     public ScreenRestart(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
 
         pointCounter = new PointCounter(750, 530);
+        bestScoreCounter = new PointCounter(750, 430); // чуть ниже
         buttonRestart = new TextButton(100, 400, "Restart");
         buttonMenu = new TextButton(100, 150, "Menu");
         background = new MovingBackground("background/restart_bg.png");
@@ -60,7 +63,8 @@ public class ScreenRestart implements Screen {
         background.draw(myGdxGame.batch);
         buttonMenu.draw(myGdxGame.batch);
         buttonRestart.draw(myGdxGame.batch);
-        pointCounter.draw(myGdxGame.batch, gamePoints);
+        pointCounter.draw(myGdxGame.batch, "Score: ", gamePoints);
+        bestScoreCounter.draw(myGdxGame.batch, "Best: ", bestScore);
 
         myGdxGame.batch.end();
     }

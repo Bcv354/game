@@ -13,6 +13,8 @@ import com.mygdx.game.charasters.Tube;
 import com.mygdx.game.components.MovingBackground;
 import com.mygdx.game.components.PointCounter;
 
+import java.util.Random;
+
 public class ScreenGame implements Screen {
 
     final int pointCounterMarginTop = 60;
@@ -22,13 +24,21 @@ public class ScreenGame implements Screen {
 
     Bird bird;
     PointCounter pointCounter;
+    PointCounter speedCounter;
     MovingBackground background;
 
     int tubeCount = 3;
     Tube[] tubes;
 
     int gamePoints;
+
+    int bestScore = 0; // добавить рядом с gamePoints
     boolean isGameOver;
+
+
+    float speedChangeTimer = 0f;
+    final float speedChangeInterval = 3f; // каждые 3 секунды меняем скорость
+    Random random = new Random();
 
     public ScreenGame(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -37,44 +47,56 @@ public class ScreenGame implements Screen {
         background = new MovingBackground("background/game_bg.png");
         bird = new Bird(20, SCR_HEIGHT / 2, 10, 200, 105);
         pointCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop);
+        speedCounter = new PointCounter(SCR_WIDTH - pointCounterMarginRight, SCR_HEIGHT - pointCounterMarginTop - 80); // добавить, чуть ниже
     }
-
 
     @Override
     public void show() {
         gamePoints = 0;
         isGameOver = false;
+        speedChangeTimer = 0f;
         bird.setY(SCR_HEIGHT / 2);
         initTubes();
+        for (Tube t : tubes) t.setSpeed(10); // сброс скорости
     }
 
     @Override
     public void render(float delta) {
+// добавить рядом с isGameOver
 
         if (isGameOver) {
+
+            if (gamePoints > bestScore) bestScore = gamePoints;
             myGdxGame.screenRestart.gamePoints = gamePoints;
+            myGdxGame.screenRestart.bestScore = bestScore;
             myGdxGame.setScreen(myGdxGame.screenRestart);
+
         }
 
         if (Gdx.input.justTouched()) {
             bird.onClick();
         }
 
-        background.move();
-        bird.fly();
+        // таймер смены скорости
+        speedChangeTimer += delta;
+        if (speedChangeTimer >= speedChangeInterval) {
+            speedChangeTimer = 0f;
+            int newSpeed = 8 + random.nextInt(8); // рандом от 8 до 15
+            for (Tube t : tubes) t.setSpeed(newSpeed);
+        }
+
+        background.move(delta);
+        bird.fly(delta);
         if (!bird.isInField()) {
-            System.out.println("not in field");
             isGameOver = true;
         }
         for (Tube tube : tubes) {
-            tube.move();
+            tube.move(delta);
             if (tube.isHit(bird)) {
                 isGameOver = true;
-                System.out.println("hit");
             } else if (tube.needAddPoint(bird)) {
                 gamePoints += 1;
                 tube.setPointReceived();
-                System.out.println(gamePoints);
             }
         }
 
@@ -86,30 +108,16 @@ public class ScreenGame implements Screen {
         background.draw(myGdxGame.batch);
         bird.draw(myGdxGame.batch);
         for (Tube tube : tubes) tube.draw(myGdxGame.batch);
-        pointCounter.draw(myGdxGame.batch, gamePoints);
+        pointCounter.draw(myGdxGame.batch, "Score: ", gamePoints);
+        speedCounter.draw(myGdxGame.batch, "Speed: ", tubes[0].speed);
 
         myGdxGame.batch.end();
     }
 
-    @Override
-    public void resize(int width, int height) {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
+    @Override public void resize(int width, int height) {}
+    @Override public void pause() {}
+    @Override public void resume() {}
+    @Override public void hide() {}
 
     @Override
     public void dispose() {
@@ -127,5 +135,4 @@ public class ScreenGame implements Screen {
             tubes[i] = new Tube(tubeCount, i);
         }
     }
-
 }
